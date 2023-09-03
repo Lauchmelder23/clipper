@@ -1,37 +1,37 @@
 ASM=nasm
+CC=$(HOME)/opt/cross/bin/i686-elf-gcc
 
 SRC_DIR=src
 BUILD_DIR=build
+ISO_DIR=$(BUILD_DIR)/iso
 
-BOOT_FILES 		= $(shell find $(SRC_DIR)/boot/ -type f -name "*.asm")
-KERN_ASM_FILES 	= $(shell find $(SRC_DIR)/kernel/ -type f -name "*.asm")
+KERNEL_ASM		:= $(shell find $(SRC_DIR)/kernel -name "*.asm")
+KERNEL_C		:= $(shell find $(SRC_DIR)/kernel -name "*.c")
 
-BOOT_BIN_FILES 	= $(patsubst src/%.asm, $(BUILD_DIR)/%.bin, $(BOOT_FILES))
-KERN_BIN_FILES 	= $(patsubst src/%.asm, $(BUILD_DIR)/%.bin, $(KERN_ASM_FILES))
+KERNEL_ASM_O	:= $(patsubst $(SRC_DIR)/kernel/%.asm, $(BUILD_DIR)/kernel/%.asm.o, $(KERNEL_ASM))
+KERNEL_C_O		:= $(patsubst $(SRC_DIR)/kernel/%.c, $(BUILD_DIR)/kernel/%.c.o, $(KERNEL_C))
 
-BOOTLOADER 		= $(BUILD_DIR)/boot.bin
-KERNEL 			= $(BUILD_DIR)/kernel.bin
-IMAGE			= $(BUILD_DIR)/clipper.img
+KERNEL 			= $(BUILD_DIR)/clipper.bin
+IMAGE			= $(BUILD_DIR)/clipper.iso
 
-.PHONY: all clipper kernel bootloader clean always
+.PHONY: all clipper kernel clean always
 
-clipper: $(IMAGE)
+clipper: kernel
+	mkdir -p $(ISO_DIR)/boot/grub
+	cp $(KERNEL) $(ISO_DIR)/boot/clipper.bin
+	cp grub/grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
+	grub-mkrescue -o $(IMAGE) $(ISO_DIR)
 
-$(IMAGE): bootloader kernel
-	dd if=/dev/zero of=$(IMAGE) bs=512 count=2880
-	mkfs.fat -F 12 -n "CLPR" $(IMAGE)
-	dd if=$(BOOTLOADER) of=$(IMAGE) conv=notrunc
-	mcopy -i $(IMAGE) $(KERNEL) "::kernel.bin"
+kernel: $(KERNEL_ASM_O) $(KERNEL_C_O)
+	$(CC) -T linker.ld -o $(KERNEL) -ffreestanding -O2 -nostdlib $^ -lgcc
 
-bootloader: $(BOOT_BIN_FILES)
-	cp $(BUILD_DIR)/boot/boot.bin $(BOOTLOADER)
-
-kernel: $(KERN_BIN_FILES)
-	cp $(BUILD_DIR)/kernel/kernel.bin $(KERNEL)
-
-$(BUILD_DIR)/%.bin: $(SRC_DIR)/%.asm
+$(BUILD_DIR)/%.asm.o: $(SRC_DIR)/%.asm
 	@mkdir -p "$(@D)"
-	$(ASM) $< -f bin -o $@
+	$(ASM) -felf32 $< -o $@
+
+$(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c
+	@mkdir -p "$(@D)"
+	$(CC) -c $< -o $@ -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 clean:
 	rm -rf $(BUILD_DIR)/*
