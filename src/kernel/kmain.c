@@ -10,6 +10,9 @@
 #	error "Please use an ix86-elf compiler"
 #endif
 
+#include "string.h"
+
 void kmain(void) {
+	puts("Clipper has booted!\r\n");
 	return;
 }

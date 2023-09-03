@@ -5,6 +5,8 @@ SRC_DIR=src
 BUILD_DIR=build
 ISO_DIR=$(BUILD_DIR)/iso
 
+INCLUDE_DIR=$(SRC_DIR)/kernel/include
+
 KERNEL_ASM		:= $(shell find $(SRC_DIR)/kernel -name "*.asm")
 KERNEL_C		:= $(shell find $(SRC_DIR)/kernel -name "*.c")
 
@@ -31,7 +33,7 @@ $(BUILD_DIR)/%.asm.o: $(SRC_DIR)/%.asm
 
 $(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c
 	@mkdir -p "$(@D)"
-	$(CC) -c $< -o $@ -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $< -o $@ -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
 clean:
 	rm -rf $(BUILD_DIR)/*
