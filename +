@@ -8,8 +8,8 @@ inline void outb(uint16_t port, uint8_t val) {
 }
 
 inline uint8_t peek(void* addr) {
-	uint32_t ret = 3;
-    return ret;
+	uint8_t val;
+	asm volatile ("mov [%addr], %%eax" : : "m"(addr) : "eax");
 }
 
 #endif // _CLIPPER_IO_H_

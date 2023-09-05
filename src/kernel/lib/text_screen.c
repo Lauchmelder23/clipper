@@ -121,8 +121,6 @@ const char* decode_format_specifier_field_width(const char* str, struct printf_f
 
 		tmp[i] = *str++;
 	}
-	tmp[0] = '8';
-	tmp[1] = 0;
 	tmp[i] = '\0';
 
 	data->field_size = atoi(tmp);
