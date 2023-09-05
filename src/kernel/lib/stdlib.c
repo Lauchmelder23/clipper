@@ -1,5 +1,34 @@
 #include "stdlib.h"
 
+int atoi(const char* str) {
+	// Blled away whitespace
+	while(*str++ == ' ');
+	str--;
+
+	int val = 0;
+	int factor = 1;
+
+	if (*str == '+') { 
+		str++; 
+	} else if (*str == '-') {
+		factor = -1;
+		str++;
+	}
+
+	const char* start = str;
+	while (*str >= '0' && *str <= '9') {
+		str++;
+	}
+
+	int power_of_ten = 1;
+	while (start < str) {
+		val += power_of_ten * ((*(--str)) - '0');
+		power_of_ten *= 10;
+	}
+
+	return factor * val;
+}
+
 char* itoa(int value, char* buffer, int base) {
 	char* ptr;
 	char* value_start;
