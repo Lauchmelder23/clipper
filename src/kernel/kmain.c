@@ -1,3 +1,4 @@
+#include "include/internal/text_screen.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -10,9 +11,13 @@
 #	error "Please use an ix86-elf compiler"
 #endif
 
-#include "string.h"
+#include "internal/text_screen.h"
 
 void kmain(void) {
-	puts("Clipper has booted!\r\n");
+	tsinit();
+
+	const char* msg = "Clipper set sail!\n~~~~~~~~~~~~~~~~~";
+	tsputs(msg, TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_CYAN);
+
 	return;
 }
