@@ -33,7 +33,7 @@ $(BUILD_DIR)/%.asm.o: $(SRC_DIR)/%.asm
 
 $(BUILD_DIR)/%.c.o: $(SRC_DIR)/%.c
 	@mkdir -p "$(@D)"
-	$(CC) -c $< -o $@ -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $< -o $@ -I$(INCLUDE_DIR) -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Wformat
 
 clean:
 	rm -rf $(BUILD_DIR)/*

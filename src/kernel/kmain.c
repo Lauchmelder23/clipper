@@ -16,8 +16,10 @@
 void kmain(void) {
 	tsinit();
 
-	const char* msg = "Clipper set sail!\n~~~~~~~~~~~~~~~~~";
+	const char* msg = "Clipper set sail!\n~~~~~~~~~~~~~~~~~\n";
 	tsputs(msg, TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_CYAN);
+
+	tsprintf("Test | Integers: %d, Unsigned: %u, Hexadecimal: %x\n", -48, 28493, 28493);
 
 	return;
 }

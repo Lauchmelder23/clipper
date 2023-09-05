@@ -36,4 +36,7 @@ void tsinit(void);
 void tsputch(char ch, uint8_t color);
 void tsputs(const char* str, uint8_t color);
 
+void tsprintf(const char* format, ...)
+	__attribute__((format (printf, 1, 2)));
+
 #endif // _CLIPPER_TEXT_SCREEN_H_
