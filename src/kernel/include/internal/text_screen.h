@@ -33,6 +33,9 @@ enum text_screen_attribute {
 
 void tsinit(void);
 
+void tsclear_screen();
+void tscursor_set(uint8_t x, uint8_t y);
+
 void tsputch(char ch, uint8_t color);
 void tsputs(const char* str, uint8_t color);
 

@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "internal/havarie.h"
+
 #if defined(__linux__)
 #	error "Please use a platform agnostic compiler"
 #endif
@@ -20,6 +22,8 @@ void kmain(void) {
 	tsputs(msg, TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_CYAN);
 
 	tsprintf("Test | Integers: %d, Unsigned: %u, Hexadecimal: %x\n", -48, 28493, 28493);
+
+	capsize();
 
 	return;
 }

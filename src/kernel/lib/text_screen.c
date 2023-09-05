@@ -28,6 +28,17 @@ void tsinit(void) {
 	outb(0x3D5, 0x20);
 }
 
+void tsclear_screen() {
+	for (uint32_t i = 0; i < ((SCREEN_WIDTH * SCREEN_HEIGHT) >> 2); i++) {
+		((uint32_t*)videomem)[i] = (uint32_t)0;
+	}
+}
+
+void tscursor_set(uint8_t x, uint8_t y) {
+	cursor_x = x;
+	cursor_y = y;
+}
+
 void tsputch(char ch, uint8_t color) {
 	const char tmp[2] = { ch, 0 };
 	tsputs(tmp, color);
@@ -46,7 +57,7 @@ void handle_special_char(char c) {
 		} break;
 
 		case '\r': cursor_x = 0; break;
-		case '\t': cursor_x += 4; break;
+		case '\t': cursor_x += 4; cursor_x -= cursor_x % 4; break;
 	}
 }
 
