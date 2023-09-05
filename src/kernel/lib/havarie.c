@@ -30,8 +30,8 @@ void print_havarie_msg() {
 		  [esi]"=m" (esi), [edi]"=m" (edi), [esp]"=m" (esp), [ebp]"=m" (ebp)
 	);
 
-	tsprintf("eax=0x%x\t\tesi=0x%x\n", eax, esi);
-	tsprintf("ebx=0x%x\t\tedi=0x%x\n", ebx, edi);
-	tsprintf("ecx=0x%x\t\tesp=0x%x\n", ecx, esp);
-	tsprintf("edx=0x%x\t\tebp=0x%x\n", edx, ebp);
+	tsprintf("eax=0x%08x\t\tesi=0x%08x\n", eax, esi);
+	tsprintf("ebx=0x%08x\t\tedi=0x%08x\n", ebx, edi);
+	tsprintf("ecx=0x%08x\t\tesp=0x%08x\n", ecx, esp);
+	tsprintf("edx=0x%08x\t\tebp=0x%08x\n", edx, ebp);
 }

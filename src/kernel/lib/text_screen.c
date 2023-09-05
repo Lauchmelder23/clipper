@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include "internal/io.h"
 #include "stdlib.h"
+#include "string.h"
 
 struct text_screen_char {
 	char character;
@@ -16,11 +17,18 @@ static uint8_t cursor_y = 0;
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 25
 
-enum printf_format_specifier {
+enum printf_format_specifier_type {
 	FORMAT_SPECIFIER_INT,
 	FORMAT_SPECIFIER_UNSIGNED,
 	FORMAT_SPECIFIER_HEXADECIMAL,
 	FORMAT_SPEFICIER_UNKNOWN
+};
+
+struct printf_format_specifier {
+	enum printf_format_specifier_type type;
+
+	int field_size;
+	char padding_char;
 };
 
 void tsinit(void) {
@@ -90,26 +98,73 @@ void tsputs(const char* ch, uint8_t color) {
 }
 
 static 
-const char* decode_format_spefifier(const char* str, enum printf_format_specifier* data) {
+const char* decode_format_specifier_flag(const char* str, struct printf_format_specifier* data) {
+	switch (*str) {
+		case '0':
+			data->padding_char = '0';
+			return str+1;
+	}
+
+	data->padding_char = '\0';
+	return str;
+}
+
+static
+const char* decode_format_specifier_field_width(const char* str, struct printf_format_specifier* data) {
+	char tmp[16];
+
+	int i;
+	for(i = 0; i < 15; i++) {
+		if (*str < '0' || *str > '9') {
+			break;
+		}
+
+		tmp[i] = *str++;
+	}
+	tmp[0] = '8';
+	tmp[1] = 0;
+	tmp[i] = '\0';
+
+	data->field_size = atoi(tmp);
+	return str;
+}
+
+static 
+const char* decode_format_spefifier(const char* str, struct printf_format_specifier* data) {
 	switch (*str) {
 		case 'd':
 		case 'i':
-			*data = FORMAT_SPECIFIER_INT;
+			data->type = FORMAT_SPECIFIER_INT;
 			return str+1;
 
 		case 'o':
 		case 'u':
-			*data = FORMAT_SPECIFIER_UNSIGNED;
+			data->type = FORMAT_SPECIFIER_UNSIGNED;
 			return str+1;
 
 		case 'x':
 		case 'X':
-			*data = FORMAT_SPECIFIER_HEXADECIMAL;
+			data->type = FORMAT_SPECIFIER_HEXADECIMAL;
 			return str+1;
 	}
 
-	*data = FORMAT_SPEFICIER_UNKNOWN;
+	data->type = FORMAT_SPEFICIER_UNKNOWN;
 	return str;
+}
+
+static 
+void put_formated_string(const char* str, const struct printf_format_specifier* specifier) {
+	// Padding
+	if (specifier->padding_char != '\0') {
+		size_t length = strlen(str);
+
+		while ((int)length < specifier->field_size) {
+			tsputch(specifier->padding_char, TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_WHITE);
+			length++;
+		}
+	}
+
+	tsputs(str, TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_WHITE);
 }
 
 static 
@@ -117,23 +172,27 @@ const char* handle_format_specifier(const char* str, va_list* args) {
 	str++;
 	char tmp[16];
 	
-	enum printf_format_specifier specifier;
+	struct printf_format_specifier specifier;
+
+	str = decode_format_specifier_flag(str, &specifier);
+	str = decode_format_specifier_field_width(str, &specifier);
+
 	str = decode_format_spefifier(str, &specifier);
-	switch (specifier) {
+	switch (specifier.type) {
 		case FORMAT_SPECIFIER_INT: {
 			int value = va_arg(*args, int);
-			tsputs(itoa(value, tmp, 10), TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_WHITE);
+			put_formated_string(itoa(value, tmp, 10), &specifier);
 		} break;
 
 		case FORMAT_SPECIFIER_UNSIGNED: {
 			unsigned int value = va_arg(*args, unsigned int);
-			tsputs(utoa(value, tmp, 10), TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_WHITE);
+			put_formated_string(utoa(value, tmp, 10), &specifier);
 		} break;
 
 
 		case FORMAT_SPECIFIER_HEXADECIMAL: {
 			unsigned int value = va_arg(*args, unsigned int);
-			tsputs(utoa(value, tmp, 16), TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_WHITE);
+			put_formated_string(utoa(value, tmp, 16), &specifier);
 		} break;
 		default: return str;
 	}
