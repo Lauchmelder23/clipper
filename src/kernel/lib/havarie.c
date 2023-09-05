@@ -115,8 +115,8 @@ void print_havarie_msg() {
 	);
 
 	tsputs("\nSegments\n", TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_BLUE);
-	tsprintf("cs=%08x\nds=%08x\nes=%08x\n\n", cs, ds, es);
-	tsprintf("ss=%08x\nfs=%08x\ngs=%08x\n\n", ss, fs, gs);
+	tsprintf("cs=0x%04x\nds=0x%04x\nes=0x%04x\n\n", cs, ds, es);
+	tsprintf("ss=0x%04x\nfs=0x%04x\ngs=0x%04x\n\n", ss, fs, gs);
 
 	dump_stack(18, 3);
 }
