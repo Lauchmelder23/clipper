@@ -3,6 +3,7 @@
 #include "internal/text_screen.h"
 #include "stdlib.h"
 #include "string.h"
+#include "internal/io.h"
 
 void capsize() {
 	print_havarie_msg();
@@ -36,10 +37,8 @@ void dump_stack(uint8_t col, uint8_t row) {
 	row++;
 
 	int esp, ebp;
-	asm("mov %%esp, %[esp]\n"
-		"mov %%ebp, %[ebp]\n"
-		: [esp]"=m" (esp), [ebp]"=m" (ebp)
-	);
+	READ_REGISTER_VALUE(esp, esp);
+	READ_REGISTER_VALUE(ebp, ebp);
 
 	int start_address = esp & ~0xF;
 	char tmp[16];
@@ -87,32 +86,26 @@ void print_havarie_msg() {
 
 	
 	int eax, ebx, ecx, edx, esi, edi, esp, ebp;
-	asm("mov %%eax, %[eax]\n"
-		"mov %%ebx, %[ebx]\n"
-		"mov %%ecx, %[ecx]\n"
-		"mov %%edx, %[edx]\n"
-		"mov %%esi, %[esi]\n"
-		"mov %%edi, %[edi]\n"
-		"mov %%esp, %[esp]\n"
-		"mov %%ebp, %[ebp]\n"
-		: [eax]"=m" (eax), [ebx]"=m" (ebx), [ecx]"=m" (ecx), [edx]"=m" (edx), 
-		  [esi]"=m" (esi), [edi]"=m" (edi), [esp]"=m" (esp), [ebp]"=m" (ebp)
-	);
+	READ_REGISTER_VALUE(eax, eax);
+	READ_REGISTER_VALUE(ebx, ebx);
+	READ_REGISTER_VALUE(ecx, ecx);
+	READ_REGISTER_VALUE(edx, edx);
+	READ_REGISTER_VALUE(esi, esi);
+	READ_REGISTER_VALUE(edi, edi);
+	READ_REGISTER_VALUE(esp, esp);
+	READ_REGISTER_VALUE(ebp, ebp);
 
 	tsputs("Registers\n", TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_BLUE);
 	tsprintf("eax=0x%08x\nebx=0x%08x\necx=0x%08x\nedx=0x%08x\n\n", eax, ebx, ecx, edx);
 	tsprintf("esi=0x%08x\nedi=0x%08x\nesp=0x%08x\nebp=0x%08x\n\n", esi, edi, esp, ebp);
 
 	short cs, ds, es, ss, fs, gs;
-	asm("mov %%cs, %[cs]\n"
-		"mov %%ds, %[ds]\n"
-		"mov %%es, %[es]\n"
-		"mov %%ss, %[ss]\n"
-		"mov %%fs, %[fs]\n"
-		"mov %%gs, %[gs]\n"
-		: [cs]"=m" (cs), [ds]"=m" (ds), [es]"=m" (es),
-		  [ss]"=m" (ss), [fs]"=m" (fs), [gs]"=m" (gs)
-	);
+	READ_REGISTER_VALUE(cs, cs);
+	READ_REGISTER_VALUE(ds, ds);
+	READ_REGISTER_VALUE(es, es);
+	READ_REGISTER_VALUE(ss, ss);
+	READ_REGISTER_VALUE(fs, fs);
+	READ_REGISTER_VALUE(gs, gs);
 
 	tsputs("\nSegments\n", TEXT_SCREEN_BG_BLACK | TEXT_SCREEN_FG_LIGHT_BLUE);
 	tsprintf("cs=0x%04x\nds=0x%04x\nes=0x%04x\n\n", cs, ds, es);
